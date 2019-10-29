@@ -975,6 +975,15 @@
       "integrity": "sha1-tdRU3CGZriJWmfNGfloH87lVuv0=",
       "dev": true
     },
+    "highland": {
+      "version": "2.13.5",
+      "resolved": "https://registry.npmjs.org/highland/-/highland-2.13.5.tgz",
+      "integrity": "sha512-dn2flPapIIAa4BtkB2ahjshg8iSJtrJtdhEb9/oiOrS5HMQTR/GuhFpqJ+11YBdtnl3AwWKvbZd1Uxr8uAmA7A==",
+      "dev": true,
+      "requires": {
+        "util-deprecate": "^1.0.2"
+      }
+    },
     "iconv-lite": {
       "version": "0.4.24",
       "resolved": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.4.24.tgz",
@@ -1563,6 +1572,12 @@
       "requires": {
         "punycode": "^2.1.0"
       }
+    },
+    "util-deprecate": {
+      "version": "1.0.2",
+      "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
+      "integrity": "sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=",
+      "dev": true
     },
     "v8-compile-cache": {
       "version": "2.1.0",

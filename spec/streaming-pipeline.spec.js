@@ -11,6 +11,7 @@ const {
     newStartFrame,
     newStartSignal
 } = require('./helpers/factories');
+const _ = require('highland');
 
 describe('streaming pipeline =>', () => {
     const textEncoder = new TextEncoder();
@@ -135,5 +136,60 @@ describe('streaming pipeline =>', () => {
                 fixedSource.pipe(streamingPipeline);
             })
         });
+    });
+
+    describe('with a bogus input =>', () => {
+        const data = {
+            '0': {
+                contentType: 'application/json',
+                payload: 2
+            },
+            '1': {
+                contentType: 'text/zglorbf',
+                payload: 'repeat this!'
+            }
+        };
+
+        beforeEach(() => {
+            fixedSource = newFixedSource([
+                newStartSignal(newStartFrame(['application/json'])),
+                ...(Object.keys(data).map((inputIndex) => {
+                    const datum = data[inputIndex];
+                    return newInputSignal(newInputFrame(inputIndex, datum.contentType, textEncoder.encode(datum.payload)))
+                }))
+            ]);
+        });
+
+        it('should not crash', (done) => {
+            const userFunction = (inputStreams, outputStreams) => {
+                const numberStream = _(inputStreams["0"]);
+                const wordStream = _(inputStreams["1"]);
+                numberStream
+                    .zip(wordStream)
+                    // .errors((err) => {
+                    //     console.log('Caught error:', err.message);
+                    // })
+                    .flatMap((numberWordPair) => {
+                        const result = [];
+                        for (let i = 0; i < numberWordPair[0]; i++) {
+                            result.push(numberWordPair[1]);
+                        }
+                        return _(result);
+                    })
+                    .pipe(outputStreams["0"]);
+
+            };
+            userFunction.$interactionModel = 'node-streams';
+            userFunction.$arity = 3;
+
+            destinationStream.on('data', () => {
+                done(new Error('should not receive data'));
+            });
+            destinationStream.on('finish', () => {
+                done();
+            });
+            streamingPipeline = new StreamingPipeline(userFunction, destinationStream, {objectMode: true});
+            fixedSource.pipe(streamingPipeline);
+        })
     });
 });
