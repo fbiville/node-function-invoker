@@ -1,5 +1,5 @@
 const {newFixedSource} = require('./helpers/factories');
-const OutputMarshaller = require('../lib/output-marshaller');
+const OutputMarshaller = require('../lib/marshalling/output-marshaller');
 
 describe('output marshaller =>', () => {
 

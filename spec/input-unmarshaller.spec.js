@@ -1,6 +1,6 @@
 const {TextEncoder} = require('util');
 const {newFixedSource, newInputFrame, newInputSignal} = require('./helpers/factories');
-const InputUnmarshaller = require('../lib/input-unmarshaller');
+const InputUnmarshaller = require('../lib/marshalling/input-unmarshaller');
 
 describe('input unmarshaller =>', () => {
     const textEncoder = new TextEncoder();
@@ -83,76 +83,5 @@ describe('input unmarshaller =>', () => {
             });
         });
     });
-
-    describe('with a custom argument transformer =>', () => {
-        let inputs;
-        let unmarshaller;
-        const inputData = ['{"age": 42}', '{"age": 2}'];
-        const outputData = [42, 2];
-
-        beforeEach(() => {
-            unmarshaller = new InputUnmarshaller({objectMode: true}, (msg) => msg.payload.age);
-            inputs = newFixedSource([
-                newInputSignal(newInputFrame(0, 'application/json', textEncoder.encode(inputData[0]))),
-                newInputSignal(newInputFrame(0, 'application/json', textEncoder.encode(inputData[1]))),
-            ]);
-        });
-
-        afterEach(() => {
-            inputs.destroy();
-            unmarshaller.destroy();
-        });
-
-        it('uses the custom argument transformer and forwards the result', (done) => {
-            let index = 0;
-            unmarshaller.on('data', (chunk) => {
-                const length = outputData.length;
-                if (index === length) {
-                    done(new Error(`should not consume more than ${length} elements, about to consume ${index}th one`));
-                }
-                expect(chunk).toEqual(outputData[index++]);
-            });
-            unmarshaller.on('end', () => {
-                done();
-            });
-
-            inputs.pipe(unmarshaller);
-        });
-    });
-
-    describe('with a custom header-based argument transformer =>', () => {
-        let inputs;
-        let unmarshaller;
-        const headers = ["the truth is...", "... still out there"];
-
-        beforeEach(() => {
-            unmarshaller = new InputUnmarshaller({objectMode: true}, (msg) => msg.headers.getValue('X-Files'));
-            inputs = newFixedSource([
-                newInputSignal(newInputFrame(0, 'application/json', textEncoder.encode('"ignored"'), [["X-Files", headers[0]]])),
-                newInputSignal(newInputFrame(0, 'application/json', textEncoder.encode('"ignored"'), [["X-Files", headers[1]]])),
-            ]);
-        });
-
-        afterEach(() => {
-            inputs.destroy();
-            unmarshaller.destroy();
-        });
-
-        it('uses the custom argument transformer and forwards the result', (done) => {
-            let index = 0;
-            unmarshaller.on('data', (chunk) => {
-                const length = headers.length;
-                if (index === length) {
-                    done(new Error(`should not consume more than ${length} elements, about to consume ${index}th one`));
-                }
-                expect(chunk).toEqual(headers[index++]);
-            });
-            unmarshaller.on('end', () => {
-                done();
-            });
-
-            inputs.pipe(unmarshaller);
-        });
-    })
 
 });

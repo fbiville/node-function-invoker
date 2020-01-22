@@ -297,7 +297,7 @@ describe('streaming pipeline =>', () => {
         })
     });
 
-    describe('with a function with incorrect argument transformers =>', () => {
+    xdescribe('with a function with incorrect argument transformers =>', () => {
         it('rejects the function with an invalid declaration of transformers ', () => {
             try {
                 const userFunction = require('./helpers/transformers/invalid-argument-transformers-streaming-function');
@@ -332,7 +332,7 @@ describe('streaming pipeline =>', () => {
         });
     });
 
-    describe('with an invalid count of argument transformers =>', () => {
+    xdescribe('with an invalid count of argument transformers =>', () => {
         const userFunction = require('./helpers/transformers/invalid-argument-transformer-count-streaming-function');
 
         beforeEach(() => {
